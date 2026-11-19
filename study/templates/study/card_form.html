@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Карточканы өңдеу | {{ source.title }} | Teach Me</title>
+    <link rel="stylesheet" href="{% static 'study/css/style.css' %}">
+</head>
+<body>
+    <header class="topbar">
+        <a href="/" class="logo">teach<span>me</span></a>
+        <span class="mode">{{ source.generation_mode|upper }}</span>
+    </header>
+
+    <main class="container">
+        <section class="intro">
+            <p class="eyebrow">EDIT FLASHCARD</p>
+            <h1>Карточканы өңдеу</h1>
+            <p class="subtitle">
+                {{ source.title }} · карточка №{{ card.position }}
+            </p>
+        </section>
+
+        <section class="source-text">
+            <details open>
+                <summary>Бастапқы мәтін (салыстыру үшін)</summary>
+                <div>{{ source.text|linebreaksbr }}</div>
+            </details>
+        </section>
+
+        <p class="card-form-note">
+            Сақтаудан кейін карточка қайта тексерілуі керек:
+            күйі «Тексеру керек» болып қалады.
+        </p>
+
+        <form method="post" class="workspace card-form">
+            {% csrf_token %}
+
+            {{ form.non_field_errors }}
+
+            {% for field in form %}
+                <div class="field">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {{ field.errors }}
+                </div>
+            {% endfor %}
+
+            <div class="form-footer">
+                <span class="hint">Дәйексөз бастапқы мәтіннен дәл көшірілуі керек.</span>
+                <div class="form-actions">
+                    <a href="{% url 'source_detail' source.pk %}" class="link-secondary">Бас тарту</a>
+                    <button type="submit">Сақтау</button>
+                </div>
+            </div>
+        </form>
+
+        <p class="back-link">
+            <a href="{% url 'home' %}">← Басты бетке оралу</a>
+        </p>
+    </main>
+
+    <footer>Teach Me <span>·</span> Study with clarity.</footer>
+</body>
+</html>

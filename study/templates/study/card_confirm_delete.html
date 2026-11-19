@@ -1,0 +1,60 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Карточканы өшіру | {{ source.title }} | Teach Me</title>
+    <link rel="stylesheet" href="{% static 'study/css/style.css' %}">
+</head>
+<body>
+    <header class="topbar">
+        <a href="/" class="logo">teach<span>me</span></a>
+        <span class="mode">{{ source.generation_mode|upper }}</span>
+    </header>
+
+    <main class="container">
+        <section class="intro">
+            <p class="eyebrow">DELETE FLASHCARD</p>
+            <h1>Карточканы өшіру</h1>
+            <p class="subtitle">
+                {{ source.title }} · карточка №{{ card.position }}
+            </p>
+        </section>
+
+        <form method="post" class="workspace">
+            {% csrf_token %}
+
+            <div class="field">
+                <label>Сұрақ</label>
+                <p>{{ card.question }}</p>
+            </div>
+
+            <p class="card-form-note">
+                Осы карточка біржола өшіріледі. Бұл әрекетті қайтару мүмкін емес.
+                Жинақтың өзі және басқа карточкалар өшірілмейді.
+            </p>
+
+            {% if error %}
+                <ul class="errorlist">
+                    <li>{{ error }}</li>
+                </ul>
+            {% endif %}
+
+            <div class="form-footer">
+                <span class="hint">Басқа карточкалардың нөмірлері өзгермейді.</span>
+                <div class="form-actions">
+                    <a href="{% url 'source_detail' source.pk %}" class="link-secondary">Бас тарту</a>
+                    <button type="submit">Иә, өшіру</button>
+                </div>
+            </div>
+        </form>
+
+        <p class="back-link">
+            <a href="{% url 'home' %}">← Басты бетке оралу</a>
+        </p>
+    </main>
+
+    <footer>Teach Me <span>·</span> Study with clarity.</footer>
+</body>
+</html>

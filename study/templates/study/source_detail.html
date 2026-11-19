@@ -22,20 +22,54 @@
             </p>
         </section>
 
+        <section class="source-text">
+            <details{% if total_count == 0 %} open{% endif %}>
+                <summary>Бастапқы мәтін</summary>
+                <div>{{ source.text|linebreaksbr }}</div>
+            </details>
+        </section>
+
         <section class="results">
             <div class="section-heading">
                 <div>
                     <p class="eyebrow">FLASHCARDS</p>
                     <h2>Карточкалар</h2>
                 </div>
-                <span class="count">{{ cards|length }} карточки</span>
+                <span class="count">{{ total_count }} карточки</span>
             </div>
+
+            <p class="verification-summary">
+                <span class="verified-count">Тексерілді {{ verified_count }} / {{ total_count }}</span>
+                <span class="pending-count">Қалды {{ pending_count }}</span>
+            </p>
+
+            <nav class="status-filter" aria-label="Карточкаларды сүзу">
+                <a href="{% url 'source_detail' source.pk %}"
+                   class="filter-link{% if status == 'all' %} active{% endif %}"
+                   {% if status == 'all' %}aria-current="page"{% endif %}>
+                    {% if status == 'all' %}● {% endif %}Барлығы ({{ total_count }})
+                </a>
+                <a href="{% url 'source_detail' source.pk %}?status=pending"
+                   class="filter-link{% if status == 'pending' %} active{% endif %}"
+                   {% if status == 'pending' %}aria-current="page"{% endif %}>
+                    {% if status == 'pending' %}● {% endif %}Тексеру керек ({{ pending_count }})
+                </a>
+                <a href="{% url 'source_detail' source.pk %}?status=verified"
+                   class="filter-link{% if status == 'verified' %} active{% endif %}"
+                   {% if status == 'verified' %}aria-current="page"{% endif %}>
+                    {% if status == 'verified' %}● {% endif %}Тексерілген ({{ verified_count }})
+                </a>
+            </nav>
 
             <div class="card-list">
                 {% for card in cards %}
                     <article class="study-card">
                         <span class="card-number">
                             {{ forloop.counter|stringformat:"02d" }}
+                        </span>
+
+                        <span class="card-status">
+                            {% if card.is_verified %}Тексерілді{% else %}Тексеру керек{% endif %}
                         </span>
 
                         <h3>{{ card.question }}</h3>
@@ -49,9 +83,40 @@
                                 {{ card.source_quote }}
                             </blockquote>
                         </details>
+
+                        <form method="post" action="{% url 'card_review' card.pk %}">
+                            {% csrf_token %}
+                            {% if card.is_verified %}
+                                <input type="hidden" name="action" value="reset">
+                                <button type="submit">Тексеруге қайтару</button>
+                            {% else %}
+                                <input type="hidden" name="action" value="verify">
+                                <button type="submit">Карточканы тексердім</button>
+                            {% endif %}
+                        </form>
+
+                        <p>
+                            <a href="{% url 'card_edit' card.pk %}">Өңдеу</a>
+                            ·
+                            <a href="{% url 'card_delete' card.pk %}">Өшіру</a>
+                        </p>
                     </article>
                 {% empty %}
-                    <p>Бұл материалда карточкалар жоқ.</p>
+                    {% if total_count == 0 %}
+                        <p>
+                            Бұл материалда карточкалар қалмады.
+                            Бастапқы конспект жоғарыдағы «Бастапқы мәтін» блогында сақталған.
+                        </p>
+                    {% else %}
+                        <p>
+                            {% if status == 'pending' %}
+                                Тексеруді қажет ететін карточка жоқ.
+                            {% else %}
+                                Тексерілген карточка әлі жоқ.
+                            {% endif %}
+                            <a href="{% url 'source_detail' source.pk %}">Барлығын көрсету</a>
+                        </p>
+                    {% endif %}
                 {% endfor %}
             </div>
         </section>
