@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ source.title }} | Teach Me</title>
+    <link rel="stylesheet" href="{% static 'study/css/style.css' %}">
+</head>
+<body>
+    <header class="topbar">
+        <a href="/" class="logo">teach<span>me</span></a>
+        <span class="mode">{{ source.generation_mode|upper }}</span>
+    </header>
+
+    <main class="container">
+        <section class="intro">
+            <p class="eyebrow">YOUR STUDY MATERIAL</p>
+            <h1>{{ source.title }}</h1>
+            <p class="subtitle">
+                {{ source.created_at|date:"d.m.Y H:i" }}
+            </p>
+        </section>
+
+        <section class="results">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">FLASHCARDS</p>
+                    <h2>Карточкалар</h2>
+                </div>
+                <span class="count">{{ cards|length }} карточки</span>
+            </div>
+
+            <div class="card-list">
+                {% for card in cards %}
+                    <article class="study-card">
+                        <span class="card-number">
+                            {{ forloop.counter|stringformat:"02d" }}
+                        </span>
+
+                        <h3>{{ card.question }}</h3>
+
+                        <details>
+                            <summary>Жауапты көрсету</summary>
+
+                            <p>{{ card.answer }}</p>
+
+                            <blockquote>
+                                {{ card.source_quote }}
+                            </blockquote>
+                        </details>
+                    </article>
+                {% empty %}
+                    <p>Бұл материалда карточкалар жоқ.</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <p>
+            <a href="{% url 'home' %}">← Басты бетке оралу</a>
+        </p>
+    </main>
+
+    <footer>Teach Me <span>·</span> Study with clarity.</footer>
+</body>
+</html>
